@@ -121,6 +121,44 @@ class EditableCampaignMonitorField extends EditableFormField
     }
 
     /**
+     * Get API key (either from a YAML config or from SiteConfig settings)
+     *
+     * @return null|string
+     */
+    private function getApiKey()
+    {
+        $cf_APIKey = $this->config()->get('api_key');
+
+        if (!$cf_APIKey) {
+            $sc = SiteConfig::current_site_config();
+            if (trim($sc->CampaignMonitorAPIKey)) {
+                $cf_APIKey = trim($sc->CampaignMonitorAPIKey);
+            }
+        }
+
+        return $cf_APIKey;
+    }
+
+    /**
+     * Get ClientID (either from a YAML config or from SiteConfig settings)
+     *
+     * @return null|string
+     */
+    private function getClientID()
+    {
+        $cf_ClientID = $this->config()->get('client_id');
+
+        if (!$cf_ClientID) {
+            $sc = SiteConfig::current_site_config();
+            if (trim($sc->CampaignMonitorClientID)) {
+                $cf_ClientID = trim($sc->CampaignMonitorClientID);
+            }
+        }
+
+        return $cf_ClientID;
+    }
+
+    /**
      * @return NumericField
      */
     public function getFormField()
@@ -181,7 +219,7 @@ class EditableCampaignMonitorField extends EditableFormField
         // if this field was set and there are lists - subscriper the user
         if (isset($data[$this->Name]) && $this->getLists()->Count() > 0) {
             $this->extend('beforeValueFromData', $data);
-            $auth = array(null, 'api_key' => $this->config()->get('api_key'));
+            $auth = array(null, 'api_key' => $this->getApiKey());
             $wrap = new CS_REST_Subscribers($this->owner->getField('ListID'), $auth);
 
             $custom_fields = $this->getCustomFields($data);
@@ -221,8 +259,8 @@ class EditableCampaignMonitorField extends EditableFormField
      */
     public function getLists()
     {
-        $auth = array('api_key' => $this->config()->get('api_key'));
-        $wrap = new CS_REST_Clients($this->config()->get('client_id'), $auth);
+        $auth = array('api_key' => $this->getApiKey());
+        $wrap = new CS_REST_Clients($this->getClientID(), $auth);
 
         $result = $wrap->get_lists();
         $cLists = array();
