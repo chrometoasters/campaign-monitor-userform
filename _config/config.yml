@@ -1,0 +1,7 @@
+---
+Name: cm_siteconfig
+---
+
+SiteConfig:
+  extensions:
+    - Chrometoaster\SiteConfigExtensions\CampaignMonitorAPIKeySiteConfigExtension
